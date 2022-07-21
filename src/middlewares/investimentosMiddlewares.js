@@ -1,3 +1,5 @@
+const corretoraModel = require('../models/corretoraModel');
+
 const validarCampos = (req, res, next) => {
   const { codCliente, codAtivo, qtdeAtivo } = req.body;
 
@@ -16,4 +18,15 @@ const validarCampos = (req, res, next) => {
   next();
 };
 
-module.exports = { validarCampos };
+const validarCompra = async (req, res, next) => {
+  const { codAtivo, qtdeAtivo } = req.body;
+  const quantidadeDisponivel = await corretoraModel.obterQuantidadeDisponivel(codAtivo);
+
+  if (quantidadeDisponivel < qtdeAtivo) {
+    return res.status(400).json({ erro: 'Compra não realizada. Quantidade disponivel excede a quantidade solicitada.' });
+  }
+
+  next();
+};
+
+module.exports = { validarCampos, validarCompra };
