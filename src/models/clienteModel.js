@@ -7,6 +7,15 @@ const comprar = async (codCliente, codAtivo, qtdeAtivo) => {
   return result.insertId;
 };
 
+const obterQuantidadeDisponivel = async (codAtivo) => {
+  const query = 'SELECT * FROM alpha_investimentos_api_db.carteira_cliente WHERE  cod_ativo = ?';
+  const [result] = await connection.execute(query, [codAtivo]);
+
+  return !result || result.length === 0
+    ? 0
+    : result[0].qtd_ativo;
+};
+
 const atualizarCarteira = async (codCliente, codAtivo, qtdeAtivo) => {
   const query = 'UPDATE alpha_investimentos_api_db.carteira_cliente  SET qtd_ativo = ? WHERE  cod_cliente = ? AND  cod_ativo = ?;';
   await connection.execute(query, [qtdeAtivo, codCliente, codAtivo]);
@@ -54,4 +63,5 @@ module.exports = {
   obterAtivoCarteiraCliente,
   atualizarCarteira,
   obterCarteiraCliente,
+  obterQuantidadeDisponivel,
 };
