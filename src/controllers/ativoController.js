@@ -1,10 +1,20 @@
 const express = require('express');
 const { validarCodigoCliente, validarCodigoAtivo } = require('../middlewares/ativosMiddlewares');
+const clienteService = require('../services/clienteService');
+const corretoraService = require('../services/corretoraService');
 
 const router = express.Router();
 
-router.get('/:codCliente', [validarCodigoCliente], async (_req, res) => res.status(200).send('/ativos/:cod-cliente'));
+router.get('/cliente/:codCliente', [validarCodigoCliente], async (req, res) => {
+  const { codCliente } = req.params;
+  const carteira = await clienteService.obterCarteira(codCliente);
+  return res.status(200).json(carteira);
+});
 
-router.get('/:codAtivo', [validarCodigoAtivo], async (_req, res) => res.status(200).send('/ativos/:cod-ativo'));
+router.get('/corretora/:codAtivo', [validarCodigoAtivo], async (req, res) => {
+  const { codAtivo } = req.params;
+  const ativo = await corretoraService.obterAtivosDisponiveis(codAtivo);
+  return res.status(200).json(ativo);
+});
 
 module.exports = router;
