@@ -25,6 +25,25 @@ const comprar = async (codCliente, codAtivo, qtdeAtivo) => {
   );
 };
 
+const vender = async (codCliente, codAtivo, qtdeAtivo) => {
+  const ativoCarteira = await clienteModel.obterAtivoCarteiraCliente(codCliente, codAtivo);
+  const obterQuantidadeDisponivel = await corretoraModel.obterQuantidadeDisponivel(codAtivo);
+
+  const qtdeAtualizada = ativoCarteira.qtd_ativo - qtdeAtivo;
+  await clienteModel.atualizarCarteira(codCliente, codAtivo, qtdeAtualizada);
+  await corretoraModel.atualizarCarteira(codAtivo, obterQuantidadeDisponivel + qtdeAtivo);
+
+  const valorAtivo = await corretoraModel.obterValorAtivo(codAtivo);
+  const codTipoOperacaoCompra = 2;
+  await clienteModel.salvarHistoricoOperacao(
+    codCliente,
+    codAtivo,
+    codTipoOperacaoCompra,
+    qtdeAtivo,
+    valorAtivo,
+  );
+};
+
 const obterCarteira = async (codCliente) => {
   const carteira = await clienteModel.obterCarteiraCliente(codCliente);
   return carteira.map((ativo) => ({
@@ -38,4 +57,5 @@ const obterCarteira = async (codCliente) => {
 module.exports = {
   comprar,
   obterCarteira,
+  vender,
 };
