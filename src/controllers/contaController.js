@@ -1,12 +1,28 @@
 const express = require('express');
-const { validarCampos, validarCodigoCliente } = require('../middlewares/contasMiddlewares');
+const { validarCampos, validarCodigoCliente, validarSaque } = require('../middlewares/contasMiddlewares');
+const contaService = require('../services/contaService');
 
 const router = express.Router();
 
-router.post('/deposito', [validarCampos], async (_req, res) => res.status(200).send('/contas/deposito'));
+router.post('/deposito', [validarCampos], async (req, res) => {
+  const { codCliente, valor } = req.body;
+  await contaService.depositar(codCliente, valor);
 
-router.post('/saque', [validarCampos], async (_req, res) => res.status(200).send('/contas/saque'));
+  return res.status(200).json({ mensagem: 'Operação realizada com sucesso.' });
+});
 
-router.get('/:codCliente', [validarCodigoCliente], async (_req, res) => res.status(200).send('/contas/:cod-cliente.'));
+router.post('/saque', [validarCampos, validarSaque], async (req, res) => {
+  const { codCliente, valor } = req.body;
+  await contaService.sacar(codCliente, valor);
+
+  return res.status(200).json({ mensagem: 'Operação realizada com sucesso.' });
+});
+
+router.get('/:codCliente', [validarCodigoCliente], async (req, res) => {
+  const { codCliente } = req.params;
+  const conta = await contaService.obterPorCliente(codCliente);
+
+  return res.status(200).json(conta);
+});
 
 module.exports = router;
