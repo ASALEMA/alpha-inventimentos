@@ -1,4 +1,6 @@
-const validarCampos = (req, res, next) => {
+const contaService = require('../services/contaService');
+
+const validarCampos = async (req, res, next) => {
   const { codCliente, valor } = req.body;
 
   if (!codCliente || codCliente <= 0) {
@@ -9,17 +11,45 @@ const validarCampos = (req, res, next) => {
     return res.status(400).json({ erro: 'Valor inválido.' });
   }
 
-  next();
-};
+  const conta = await contaService.obterPorCliente(codCliente);
 
-const validarCodigoCliente = (req, res, next) => {
-  const { codCliente } = req.params;
-
-  if (!codCliente || codCliente <= 0) {
+  if (!conta) {
     return res.status(400).json({ erro: 'Código de cliente inválido.' });
   }
 
   next();
 };
 
-module.exports = { validarCampos, validarCodigoCliente };
+const validarCodigoCliente = async (req, res, next) => {
+  const { codCliente } = req.params;
+
+  if (!codCliente || codCliente <= 0) {
+    return res.status(400).json({ erro: 'Código de cliente inválido.' });
+  }
+
+  const conta = await contaService.obterPorCliente(codCliente);
+
+  if (!conta) {
+    return res.status(400).json({ erro: 'Código de cliente inválido.' });
+  }
+
+  next();
+};
+
+const validarSaque = async (req, res, next) => {
+  const { codCliente, valor } = req.body;
+  const conta = await contaService.obterPorCliente(codCliente);
+  console.log(conta, valor);
+
+  if (!conta.saldo || valor > parseFloat(conta.saldo)) {
+    return res.status(400).json({ erro: 'Saldo insuficiente para saque.' });
+  }
+
+  next();
+};
+
+module.exports = {
+  validarCampos,
+  validarCodigoCliente,
+  validarSaque,
+};

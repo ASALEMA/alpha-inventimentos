@@ -58,6 +58,18 @@ INSERT INTO
 VALUES
     (3, 2000);
 
+CREATE TABLE alpha_investimentos_api_db.conta(
+    cod_conta INT PRIMARY key AUTO_INCREMENT,
+    cod_cliente INT NOT NULL,
+    val_saldo DECIMAL(8, 2),
+    FOREIGN KEY(cod_cliente) REFERENCES cliente(cod_cliente)
+) engine = InnoDB;
+
+INSERT INTO
+    alpha_investimentos_api_db.conta (cod_cliente, val_saldo)
+VALUES
+    (1, 1000);
+
 CREATE TABLE alpha_investimentos_api_db.carteira_cliente(
     cod_ativo INT,
     cod_cliente INT,

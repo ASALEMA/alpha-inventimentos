@@ -6,7 +6,7 @@ const comprar = async (codCliente, codAtivo, qtdeAtivo) => {
   const quantidadeDisponivelCorretora = await corretoraModel.obterQuantidadeDisponivel(codAtivo);
 
   if (!ativoCarteira) {
-    await clienteModel.comprar(codCliente, codAtivo, qtdeAtivo);
+    await clienteModel.adicionarNovoAtivo(codCliente, codAtivo, qtdeAtivo);
   } else {
     const qtdeAtualizada = qtdeAtivo + ativoCarteira.qtd_ativo;
     await clienteModel.atualizarCarteira(codCliente, codAtivo, qtdeAtualizada);
@@ -46,6 +46,11 @@ const vender = async (codCliente, codAtivo, qtdeAtivo) => {
 
 const obterCarteira = async (codCliente) => {
   const carteira = await clienteModel.obterCarteiraCliente(codCliente);
+
+  if (!carteira) {
+    return [];
+  }
+
   return carteira.map((ativo) => ({
     codCliente: ativo.cod_cliente,
     codAtivo: ativo.cod_ativo,
